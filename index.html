@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GCV Bridge | ÌÓÑ ÇáÚãáÇÊ</title>
+    <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+    <style>
+        body { font-family: sans-serif; background: #1a1a1a; color: white; text-align: center; padding: 20px; }
+        .card { background: #2d2d2d; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); max-width: 400px; margin: auto; }
+        .btn { background: #fae100; color: black; border: none; padding: 12px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 15px; }
+        .status { color: #00ff00; margin-top: 10px; font-size: 0.9em; }
+        h2 { color: #fae100; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h2>ÌÓÑ GCV ÇáÇÓÊÑÇÊíÌí</h2>
+        <p>ÑÕíÏß ÇáÍÇáí İí ÇáÊÚÏíä:</p>
+        <h3 id="user-balance">ÌÇÑí ÇáÊÍãíá...</h3>
+        <hr>
+        <p id="user-name">ãÑÍÈÇğ Èß İí áæÍÉ ÇáãØæÑ</p>
+        <div id="auth-status" class="status">İí ÇäÊÙÇÑ ÇáÊæËíŞ...</div>
+        <button class="btn" onclick="startPayment()">ÊÌÑÈÉ ÊÍæíá ÇÎÊÈÇÑíÉ (GCV)</button>
+    </div>
+
+    <script>
+        // 1. ÊåíÆÉ ÇáÊØÈíŞ áæÖÚ ÇáÓÇäÏ ÈæßÓ (Íá ãÔßáÉ ÇáÊÍãíá)
+        const Pi = window.Pi;
+        Pi.init({ version: "1.9", sandbox: true });
+
+        async function authenticateUser() {
+            try {
+                const scopes = ['username', 'payments'];
+                
+                // ÏÇáÉ ãÚÇáÌÉ ÇáãÏİæÚÇÊ ÛíÑ ÇáãßÊãáÉ
+                const onIncompletePaymentFound = (payment) => {
+                    console.log("íæÌÏ ÏİÚ ãÚáŞ:", payment);
+                };
+
+                // 2. ØáÈ ÇáÊæËíŞ ãä ÇáÔÈßÉ
+                const user = await Pi.authenticate(scopes, onIncompletePaymentFound);
+                
+                document.getElementById('user-name').innerText = "ãÑÍÈÇğ: " + user.user.username;
+                document.getElementById('auth-status').innerText = "Êã ÇáÇÊÕÇá ÈäÌÇÍ ÈÇáÈáæßÔíä ?";
+                document.getElementById('user-balance').innerText = "14,823 Pi"; // ÑÕíÏß ÇáĞí ÍÏÏäÇå ÓÇÈŞÇğ
+                
+            } catch (err) {
+                document.getElementById('auth-status').innerText = "ÎØÃ İí ÇáÊæËíŞ: " + err.message;
+                document.getElementById('auth-status').style.color = "red";
+            }
+        }
+
+        // ÊÔÛíá ÇáÊæËíŞ İæÑ İÊÍ ÇáÊØÈíŞ
+        authenticateUser();
+
+        function startPayment() {
+            alert("ÓíÊã ÊİÚíá ÈæÇÈÉ ÇáÏİÚ ÈÓÚÑ 314,159$ (GCV) İæÑ ÇÓÊßãÇá ÇáÑÈØ ÇáäåÇÆí!");
+        }
+    </script>
+</body>
+</html>
