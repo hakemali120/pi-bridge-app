@@ -1,10 +1,37 @@
-"use client"
+<script>
+        // 1. التأكد من تعريف Pi فوراً
+        const Pi = window.Pi;
+        
+        // 2. التهيئة الفورية (Critical)
+        Pi.init({ version: "1.9", sandbox: true });
 
-export default function Page() {
-  return (
-    <div style={{ padding: "20px", textAlign: "center" }}>
-      <h1>Pi Bridge is Coming Back to Life! 🚀</h1>
-      <p>Targeting $0.22 - Supporting GCV</p>
-    </div>
-  )
-}
+        async function startBridge() {
+            console.log("بدء محاولة الاتصال...");
+            try {
+                // 3. طلب التوثيق مباشرة
+                const user = await Pi.authenticate(['username', 'payments'], (payment) => {
+                    console.log("جاري معالجة دفع:", payment);
+                });
+
+                console.log("تم تسجيل الدخول بنجاح:", user.user.username);
+                
+                // 4. تحديث الواجهة
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('main-ui').style.display = 'block';
+                document.getElementById('user-name').innerText = user.user.username;
+
+            } catch (err) {
+                console.error("عطل في الاتصال:", err);
+                // محاولة إعادة تشغيل بسيطة
+                setTimeout(() => {
+                    if(!window.location.hash) {
+                        window.location.hash = 'reconnect';
+                        window.location.reload();
+                    }
+                }, 5000);
+            }
+        }
+
+        // تشغيل الوظيفة دون انتظار onload الطويل
+        startBridge();
+    </script>
