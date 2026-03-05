@@ -1,67 +1,37 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GCV Bridge - Pi Network</title>
-    <script src="https://sdk.minepi.com/pi-sdk.js"></script>
-    <style>
-        body { background-color: #000; color: #fff; font-family: Arial, sans-serif; text-align: center; padding: 20px; }
-        .card { border: 1px solid #333; padding: 20px; border-radius: 15px; background: #111; margin-top: 50px; }
-        .btn { background: #ff4500; color: white; border: none; padding: 15px 30px; border-radius: 10px; cursor: pointer; font-size: 18px; margin-top: 20px; }
-        #loading { color: #888; margin-top: 100px; }
-    </style>
-</head>
-<body>
-
-    <div id="loading">
-        <h2>جاري الاتصال ببلوكشين Pi...</h2>
-        <p>يرجى الانتظار، إذا استمر التحميل قم بتحديث الصفحة.</p>
-    </div>
-
-    <div id="main-ui" style="display: none;">
-        <div class="card">
-            <h1>جسر GCV الرقمي 💎</h1>
-            <p>مرحباً بك: <span id="user-name" style="color: #ff4500;">...</span></p>
-            <hr style="border: 0.5px solid #222;">
-            <h3>رصيدك الحالي: 14,826.86 Pi</h3>
-            <p style="color: #0f0;">الحالة: متصل بالشبكة (Sandbox Mode) ✅</p>
-            <button class="btn" onclick="alert('سيتم تفعيل الدفع بسعر GCV قريباً!')">بدء عملية دفع تجريبية</button>
-        </div>
-    </div>
-
-    <script>
+<script>
+        // 1. التأكد من تعريف Pi فوراً
         const Pi = window.Pi;
+        
+        // 2. التهيئة الفورية (Critical)
         Pi.init({ version: "1.9", sandbox: true });
 
         async function startBridge() {
+            console.log("بدء محاولة الاتصال...");
             try {
-                // محاولة التوثيق مع مهلة 10 ثوانٍ
-                const user = await Promise.race([
-                    Pi.authenticate(['username', 'payments'], (payment) => {
-                        console.log("Payment status:", payment);
-                    }),
-                    new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 10000))
-                ]);
+                // 3. طلب التوثيق مباشرة
+                const user = await Pi.authenticate(['username', 'payments'], (payment) => {
+                    console.log("جاري معالجة دفع:", payment);
+                });
 
-                // إخفاء شاشة التحميل وإظهار الواجهة
+                console.log("تم تسجيل الدخول بنجاح:", user.user.username);
+                
+                // 4. تحديث الواجهة
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('main-ui').style.display = 'block';
                 document.getElementById('user-name').innerText = user.user.username;
 
             } catch (err) {
-                console.error("خطأ في الاتصال:", err);
-                // تحديث تلقائي بسيط في حال التعليق
-                if(!window.location.hash) {
-                    window.location.hash = 'retry';
-                    window.location.reload();
-                }
+                console.error("عطل في الاتصال:", err);
+                // محاولة إعادة تشغيل بسيطة
+                setTimeout(() => {
+                    if(!window.location.hash) {
+                        window.location.hash = 'reconnect';
+                        window.location.reload();
+                    }
+                }, 5000);
             }
         }
 
-        // تشغيل الوظيفة فور تحميل الصفحة
-        window.onload = startBridge;
+        // تشغيل الوظيفة دون انتظار onload الطويل
+        startBridge();
     </script>
-</body>
-</html>
-
